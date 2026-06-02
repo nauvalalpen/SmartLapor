@@ -61,7 +61,7 @@ Pengembangan arsitektur ini didampingi oleh _Agentic AI_ sebagai _Technical Co-f
 
 Dokumen lengkap terkait analisis bisnis, _Pitch Deck_, dan _Technical Whitepaper_ dapat diakses pada folder `/docs` di repository ini:
 
-- [Laporan (PDF)](docs/Laporan UTS Topik Khusus - Nauval Alpen Perdana.pdf)
-- [PPT (PDF)](docs/PPT Topik Khusus - Nauval Alpen Perdana.pdf)
+- [Laporan (PDF)](docs/Laporan%20UTS%20Topik%20Khusus%20-%20Nauval%20Alpen%20Perdana.pdf)
+- [PPT (PDF)](docs/PPT%20Topik%20Khusus%20-%20Nauval%20Alpen%20Perdana.pdf)
 
 ---
