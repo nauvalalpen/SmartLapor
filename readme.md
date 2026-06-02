@@ -27,52 +27,9 @@ Proyek ini disusun sebagai pemenuhan Tugas UTS Mata Kuliah **Topik Khusus** (Tek
 
 ## 🏗️ System Architecture
 
-Diagram di bawah ini menggambarkan topologi _Event-Driven Microservices_ yang memisahkan proses _Read/Write_ dan mendelegasikan tugas berat ke _background worker_.
+Diagram arsitektur di bawah ini menggambarkan topologi _Event-Driven Microservices_ yang memisahkan proses _Read/Write_ dan mendelegasikan tugas berat ke _background worker_.
 
-```mermaid
-graph TD
-    User(("📱 Warga Pelapor"))
-    Admin(("💻 Admin Dinas PU"))
-    API["🌐 API Gateway / Backend Server"]
-
-    User -->|1. Upload Foto dan Lokasi| API
-    Admin -->|Membaca Dashboard Peta| API
-
-    subgraph Docker_Environment ["🐳 Docker Environment Production"]
-        MQ[("🐇 RabbitMQ Queue")]
-        Cache[("⚡ Redis Cache")]
-        AI["🤖 Agentic AI Worker"]
-        MCP["🌉 MCP Server Protocol"]
-        DB[("🍃 MongoDB Database")]
-        S3[("☁️ Object Storage S3")]
-
-        API -->|2. Simpan File Asli| S3
-        API -->|3. Kirim Task Laporan| MQ
-        API -->|Akses Peta Cepat| Cache
-
-        MQ -->|4. Tarik Antrean Foto| AI
-        AI -->|5. Analisis Kerusakan| AI
-
-        AI -->|6. Kirim Keputusan Validasi| MCP
-        MCP -->|7. Update Status Laporan| DB
-
-        DB -.->|8. Update Data Terbaru| Cache
-    end
-
-    classDef rabbit fill:#ff6600,stroke:#333,stroke-width:2px,color:#fff;
-    classDef redis fill:#dc382d,stroke:#333,stroke-width:2px,color:#fff;
-    classDef mongo fill:#47a248,stroke:#333,stroke-width:2px,color:#fff;
-    classDef ai fill:#6b5b95,stroke:#333,stroke-width:2px,color:#fff;
-    classDef mcp fill:#005b96,stroke:#333,stroke-width:2px,color:#fff;
-    classDef docker fill:#e6f2ff,stroke:#0db7ed,stroke-width:2px,stroke-dasharray: 5 5;
-
-    class MQ rabbit;
-    class Cache redis;
-    class DB mongo;
-    class AI ai;
-    class MCP mcp;
-    class Docker_Environment docker;
-```
+![Arsitektur Sistem SmartLapor](docs/Arsitektur%20Sistem.png)
 
 ## 🛠️ Infrastructure as Code (How to Run)
 
