@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  # 1. MONGODB (Primary Database)
+  # Digunakan untuk menyimpan data laporan warga dengan skema fleksibel dan GeoJSON.
+  mongodb:
+    image: mongo:7.0
+    container_name: smartLapor_mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: securepassword123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db # Memastikan data pelaporan tidak hilang saat container mati
+    networks:
+      - smartLapor_net
+
+  # 2. RABBITMQ (Message Broker)
+  # Digunakan sebagai shock-absorber agar server tidak down saat ratusan warga upload foto bersamaan.
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: smartLapor_rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: securepassword123
+    ports:
+      - "5672:5672" # Port utama untuk jalur komunikasi pengiriman pesan (AMQP)
+      - "15672:15672" # Port untuk membuka Dashboard Web UI RabbitMQ
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq # Menyimpan status antrean agar tidak musnah
+    networks:
+      - smartLapor_net
+
+  # 3. REDIS (In-Memory Cache)
+  # Digunakan untuk menyimpan sementara (caching) data Peta sebaran jalan rusak agar loading instan.
+  redis:
+    image: redis:alpine
+    container_name: smartLapor_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data # Snapshot memori Redis
+    networks:
+      - smartLapor_net
+
+  # 4. API GATEWAY & AI WORKER (Simulasi Application Tier)
+  # Ini adalah wadah untuk aplikasi utama dan Agen AI yang dibangunkan (dibuild) via Dockerfile
+  api_backend:
+    image: node:18-alpine
+    container_name: smartLapor_api
+    working_dir: /app
+    command: tail -f /dev/null # Simulasi server tetap hidup (keep-alive)
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - redis
+    networks:
+      - smartLapor_net
+
+# Definisi Volumes untuk Data Persistence (Krusial untuk Server Production)
+volumes:
+  mongodb_data:
+  rabbitmq_data:
+  redis_data:
+
+# Definisi Bridge Network agar antar container bisa saling berkomunikasi dengan aman
+networks:
+  smartLapor_net:
+    driver: bridge
